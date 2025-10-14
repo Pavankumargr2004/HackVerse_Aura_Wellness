@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AURA WELLNESS - Your Digital Brain Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://rsms.me/inter/inter.css');
+      
+      :root { /* Dark theme by default */
+        --background: #0A0E1A; /* Deep Navy Blue */
+        --foreground: #E0E7FF; /* Lavender White */
+        --card: #161B29; /* Darker card background */
+        --card-foreground: #E0E7FF;
+        --popover: #0A0E1A;
+        --popover-foreground: #E0E7FF;
+        --primary: #22D3EE; /* Cyan-400 */
+        --primary-rgb: 34, 211, 238;
+        --primary-foreground: #0A0E1A;
+        --secondary: #1E293B; /* Slate-800 */
+        --secondary-foreground: #E0E7FF;
+        --muted: #334155; /* Slate-700 */
+        --muted-foreground: #94A3B8; /* Slate-400 */
+        --accent: #334155;
+        --accent-foreground: #E0E7FF;
+        --destructive: #F472B6; /* Pink-400 */
+        --destructive-foreground: #0A0E1A;
+        --border: #334155;
+        --input: #1E293B;
+        --ring: #22D3EE;
+        --radius: 0.75rem;
+        transition: --primary 0.5s ease-in-out;
+      }
+
+      /* Emotion-Driven UI Styles */
+      html[data-mood="Joy"] { --primary: #F59E0B; --ring: #F59E0B; --primary-rgb: 245, 158, 11; } /* amber-500 */
+      html[data-mood="Sadness"] { --primary: #4285F4; --ring: #4285F4; --primary-rgb: 66, 133, 244; } /* Google Blue alt */
+      html[data-mood="Anger"] { --primary: #D93025; --ring: #D93025; --primary-rgb: 217, 48, 37; } /* Google Red */
+      html[data-mood="Fear"] { --primary: #7E57C2; --ring: #7E57C2; --primary-rgb: 126, 87, 194; } /* Deep Purple */
+      html[data-mood="Surprise"] { --primary: #34D399; --ring: #34D399; --primary-rgb: 52, 211, 153; } /* emerald-400 */
+      html[data-mood="Disgust"] { --primary: #4ADE80; --ring: #4ADE80; --primary-rgb: 74, 222, 128; } /* green-400 */
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--background);
+        color: var(--foreground);
+        overscroll-behavior: none;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .glass-card {
+        background: rgba(22, 27, 41, 0.5); /* Dark mode glass */
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        transition: border-color 0.3s ease-in-out;
+      }
+      
+      .glass-card:hover {
+        border-color: var(--primary);
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Biofeedback glow effect */
+      @keyframes bio-glow {
+        0% { box-shadow: 0 0 5px 2px rgba(244, 114, 182, 0.2); }
+        50% { box-shadow: 0 0 40px 12px rgba(244, 114, 182, 0.4); }
+        100% { box-shadow: 0 0 5px 2px rgba(244, 114, 182, 0.2); }
+      }
+      .biofeedback-glow {
+        animation: bio-glow 3s ease-in-out infinite;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--background);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--muted);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--secondary);
+      }
+
+      /* New styles for Mindful Tap game */
+      @keyframes pop-in {
+        0% { transform: scale(0.5); opacity: 0; }
+        70% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0); }
+      }
+
+      .mindful-dot {
+        width: 3rem; /* 48px */
+        height: 3rem;
+        background-color: var(--primary);
+        border-radius: 9999px;
+        position: absolute;
+        /* The translate is handled in the style prop */
+        animation: pop-in 0.3s ease-out forwards, pulse 2s infinite;
+        transition: transform 0.2s, opacity 0.2s;
+        cursor: pointer;
+      }
+
+      .mindful-dot.tapped {
+        animation: none;
+        transform: scale(1.5) !important; /* Overwrite inline style for animation */
+        opacity: 0;
+      }
+
+      /* Custom Toggle Switch Styles */
+      .toggle-switch-track {
+        width: 50px;
+        height: 28px;
+        border-radius: 14px;
+        background-color: var(--secondary);
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        border: 1px solid var(--muted);
+      }
+
+      .toggle-switch-knob {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 20px;
+        height: 20px;
+        background-color: var(--muted-foreground);
+        border-radius: 50%;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      }
+
+      .toggle-switch-input:checked + .toggle-switch-track {
+        background-color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .toggle-switch-input:checked + .toggle-switch-track .toggle-switch-knob {
+        transform: translateX(22px);
+        background-color: #FFFFFF;
+        box-shadow: 0 0 8px rgba(var(--primary-rgb), 0.5);
+      }
+
+      /* Calm Tales Styles */
+      .story-book-cover {
+        aspect-ratio: 2 / 3;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1rem;
+        background-size: cover;
+        background-position: center;
+      }
+      .story-book-cover:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 20px 25px -5px rgba(var(--primary-rgb), 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .story-book-cover::before { /* Spine effect */
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 6px;
+        background: rgba(0,0,0,0.1);
+        border-radius: 2px;
+      }
+      .story-book-cover-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 50%);
+      }
+
+      .story-reader-view {
+        background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+        overflow-y: auto;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        color: var(--foreground);
+      }
+      
+      .story-reader-content h1 {
+        font-size: 2.25rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+      }
+      .story-reader-content h2 {
+        font-size: 1.125rem;
+        color: var(--muted-foreground);
+        margin-bottom: 2rem;
+      }
+      .story-reader-content p {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+      }
+      .story-reader-content .quote {
+        font-style: italic;
+        padding-left: 1.5rem;
+        border-left: 4px solid var(--primary);
+        margin: 2rem 0;
+        font-size: 1.25rem;
+        color: var(--muted-foreground);
+      }
+
+      /* Tic Tac Toe Animations */
+      @keyframes place-piece {
+        from { transform: scale(0.5); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .tic-tac-toe-piece {
+        animation: place-piece 0.3s ease-out;
+      }
+
+      @keyframes draw-line {
+        from { width: 0; }
+        to { width: 100%; }
+      }
+
+      .strike-line {
+        position: absolute;
+        background-color: var(--destructive);
+        height: 5px;
+        border-radius: 5px;
+        animation: draw-line 0.5s ease-out forwards;
+        box-shadow: 0 0 10px var(--destructive);
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.21.0",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "recharts": "https://aistudiocdn.com/recharts@^3.2.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.544.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

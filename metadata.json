@@ -1,0 +1,8 @@
+{
+  "name": "Copy of AURA WELLNESS - Cognitive Digital Twin",
+  "description": "A next-gen AI system that understands, predicts, and optimizes mental health. It continuously learns from your neuro-behavioral patterns, predicts emotional fluctuations, and offers real-time, personalized interventions.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
